@@ -1,0 +1,20 @@
+function obj = mon_J_pure_hand_eye_func_sQPEP(in1,in2,scale)
+q0 = in1(1,:);
+q1 = in1(2,:);
+q2 = in1(3,:);
+q3 = in1(4,:);
+t1 = in2(1,:);
+t2 = in2(2,:);
+t3 = in2(3,:);
+t5 = q0.^2;
+t6 = q0.^3;
+t7 = q1.^2;
+t8 = q1.^3;
+t9 = q2.^2;
+t10 = q2.^3;
+t11 = q3.^2;
+t12 = q3.^3;
+mt1 = [t5.^2,q1.*t6,q2.*t6,q3.*t6,t5.*t7,q1.*q2.*t5,q1.*q3.*t5,t5.*t9,q2.*q3.*t5,t5.*t11,t1.*t5,t2.*t5,t3.*t5,scale.*t5,q0.*t8,q0.*q2.*t7,q0.*q3.*t7,q0.*q1.*t9,q0.*q1.*q2.*q3,q0.*q1.*t11,q0.*q1.*t1,q0.*q1.*t2,q0.*q1.*t3,q0.*q1.*scale,q0.*t10,q0.*q3.*t9,q0.*q2.*t11,q0.*q2.*t1,q0.*q2.*t2,q0.*q2.*t3,q0.*q2.*scale,q0.*t12,q0.*q3.*t1,q0.*q3.*t2,q0.*q3.*t3,q0.*q3.*scale,t7.^2,q2.*t8,q3.*t8,t7.*t9,q2.*q3.*t7,t7.*t11,t1.*t7,t2.*t7,t3.*t7,scale.*t7,q1.*t10,q1.*q3.*t9,q1.*q2.*t11,q1.*q2.*t1,q1.*q2.*t2,q1.*q2.*t3,q1.*q2.*scale,q1.*t12,q1.*q3.*t1,q1.*q3.*t2];
+mt2 = [q1.*q3.*t3,q1.*q3.*scale,t9.^2,q3.*t10,t9.*t11,t1.*t9,t2.*t9,t3.*t9,scale.*t9,q2.*t12,q2.*q3.*t1,q2.*q3.*t2,q2.*q3.*t3,q2.*q3.*scale,t11.^2,t1.*t11,t2.*t11,t3.*t11,scale.*t11,t1.^2,t1.*t2,t1.*t3,scale.*t1,t2.^2,t2.*t3,scale.*t2,t3.^2,scale.*t3,scale.^2];
+obj = [mt1,mt2];
+end

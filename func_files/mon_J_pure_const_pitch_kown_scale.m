@@ -1,0 +1,23 @@
+function obj = mon_J_pure_const_pitch_kown_scale(in1,in2)
+ac = in1(1,:);
+as = in1(2,:);
+gc = in1(3,:);
+gs = in1(4,:);
+t1 = in2(1,:);
+t2 = in2(2,:);
+t4 = ac.^2;
+t5 = ac.^3;
+t7 = as.^2;
+t8 = as.^3;
+t10 = gc.^2;
+t11 = gc.^3;
+t13 = gs.^2;
+t14 = gs.^3;
+t6 = t4.^2;
+t9 = t7.^2;
+t12 = t10.^2;
+t15 = t13.^2;
+mt1 = [t6.*t12,gs.*t6.*t11,t6.*t10.*t13,gc.*t6.*t14,t6.*t15,as.*t5.*t12,as.*gs.*t5.*t11,as.*t5.*t10.*t13,as.*gc.*t5.*t14,as.*t5.*t15,t4.*t7.*t12,gs.*t4.*t7.*t11,t4.*t7.*t10.*t13,gc.*t4.*t7.*t14,t4.*t7.*t15,t1.*t4.*t10,t2.*t4.*t10,t4.*t10,gc.*gs.*t1.*t4,gc.*gs.*t2.*t4,gc.*gs.*t4,t1.*t4.*t13,t2.*t4.*t13,t4.*t13,ac.*t8.*t12,ac.*gs.*t8.*t11,ac.*t8.*t10.*t13,ac.*gc.*t8.*t14,ac.*t8.*t15,ac.*as.*t1.*t10,ac.*as.*t2.*t10,ac.*as.*t10,ac.*as.*gc.*gs.*t1,ac.*as.*gc.*gs.*t2,ac.*as.*gc.*gs,ac.*as.*t1.*t13,ac.*as.*t2.*t13,ac.*as.*t13,t9.*t12,gs.*t9.*t11,t9.*t10.*t13,gc.*t9.*t14,t9.*t15,t1.*t7.*t10,t2.*t7.*t10,t7.*t10];
+mt2 = [gc.*gs.*t1.*t7,gc.*gs.*t2.*t7,gc.*gs.*t7,t1.*t7.*t13,t2.*t7.*t13,t7.*t13,t1.^2,t1.*t2,t1,t2.^2,t2,1.0];
+obj = [mt1,mt2];
+end

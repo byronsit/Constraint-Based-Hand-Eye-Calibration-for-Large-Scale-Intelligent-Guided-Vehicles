@@ -1,0 +1,143 @@
+
+% 普通scale的AX=XB，但是有const的z,并且不需要求解pitch
+
+clear all
+close all
+clc
+
+addpath('func_files');
+addpath('utils');
+
+%syms scale real
+
+syms q0 q1 q2 q3 real
+syms t1 t2 t3 lambda mu real
+syms pc ps ac as gc gs real
+
+% syms pa_1 pa_2 pa_3 real
+% syms pb_1 pb_2 pb_3 real
+% syms nv_1 nv_2 nv_3 real
+problem_name = ['const_pitch_kown_scale'];
+q_exp4 = [q0^4, q0^3*q1, q0^3*q2, q0^3*q3, q0^2*q1^2, q0^2*q1*q2, q0^2*q1*q3, q0^2*q2^2, q0^2*q2*q3, q0^2*q3^2, q0*q1^3, q0*q1^2*q2, q0*q1^2*q3, q0*q1*q2^2, q0*q1*q2*q3, q0*q1*q3^2, q0*q2^3, q0*q2^2*q3, q0*q2*q3^2, q0*q3^3, q1^4, q1^3*q2, q1^3*q3, q1^2*q2^2, q1^2*q2*q3, q1^2*q3^2, q1*q2^3, q1*q2^2*q3, q1*q2*q3^2, q1*q3^3, q2^4, q2^3*q3, q2^2*q3^2, q2*q3^3, q3^4];
+q_exp3 = [q0^3, q0^2*q1, q0^2*q2, q0^2*q3, q0*q1^2, q0*q1*q2, q0*q1*q3, q0*q2^2, q0*q2*q3, q0*q3^2, q1^3, q1^2*q2, q1^2*q3, q1*q2^2, q1*q2*q3, q1*q3^2, q2^3, q2^2*q3, q2*q3^2, q3^3];
+q_exp2 = [q0^2, q0*q1, q0*q2, q0*q3, q1^2, q1*q2, q1*q3, q2^2, q2*q3, q3^2];
+a2g2 = [ac^2*gc^2, ac^2*gc*gs, ac^2*gs^2, ac*as*gc^2, ac*as*gc*gs, ac*as*gs^2, as^2*gc^2, as^2*gc*gs, as^2*gs^2];
+
+syms A11 A12 A13 A14 real
+syms A21 A22 A23 A24 real
+syms A31 A32 A33 A34 real
+%syms scale real
+
+A = [
+    A11, A12, A13, A14;
+    A21, A22, A23, A24;
+    A31, A32, A33, A34;
+      0,   0,   0,   1;
+      ];
+
+syms B11 B12 B13 B14 real
+syms B21 B22 B23 B24 real
+syms B31 B32 B33 B34 real
+
+B = [
+    B11, B12, B13, B14;
+    B21, B22, B23, B24;
+    B31, B32, B33, B34;
+      0,   0,   0,   1;
+      ];
+  
+  
+syms q0 q1 q2 q3 real
+syms t1 t2 t3 lambda real
+q = [q0; q1; q2; q3];
+
+
+syms delta_p alpha gama real
+
+
+quat2axang([1 0 0 0 ])
+axang_qy = [0 1 0 delta_p];
+axang_qz = [0 0 1 alpha];
+axang_qx = [1 0 0 gama];
+
+qy = [cos(delta_p/2), 0, sin(delta_p/2), 0];
+qz = [cos(alpha/2), 0, 0, sin(alpha/2)];
+qx = [cos(gama/2),sin(gama/2),0,0];
+
+%syms delta_p_2 alpha_2 gama_2
+% qy = [cos(delta_p_2), 0, sin(delta_p_2), 0];
+% qz = [cos(alpha_2), 0, 0, sin(alpha_2)];
+% qx = [cos(gama_2),sin(gama_2),0,0];
+
+qqq=quaternion_multiply(quaternion_multiply(qy,qz),qx)
+
+
+RRR = q2R(qqq)';
+
+RR = q2R(qy).'*q2R(qz).'*q2R(qx).'; %和quat2rotm对应，老吴写的q2R是逆似乎。可能遵循某些规则我不懂?
+RR = simplify(q2R(qy)).'* simplify(q2R(qz)).'* simplify(q2R(qx)).'; %和quat2rotm对应，老吴写的q2R是逆似乎。可能遵循某些规则我不懂?
+
+rot_sym = [alpha, gama]
+%尝试化简RR的形式
+
+
+
+tt = [t1; t2]; 
+
+XX = [
+    RR, [t1;t2;t3];
+    zeros(1, 3), 1];
+
+J_pure = J_func_hand_eye(XX, A, B);
+
+
+
+x = [ac; as; gc; gs; t1; t2; lambda; mu]; %要求的变量
+x_origin = [alpha, gama, t1 ,t2]
+
+Jacob = jacobian(J_pure, x_origin).'; %对原始的关于三角函数的进行求导
+Jacob = simplify(Jacob);
+
+mons={};
+
+for i = 1 : 4
+    Jacob(i) = simplify(subs(Jacob(i), sin(gama), gs));
+    Jacob(i) = simplify(subs(Jacob(i), cos(gama), gc));
+    Jacob(i) = simplify(subs(Jacob(i), sin(alpha), as));
+    Jacob(i) = simplify(subs(Jacob(i), cos(alpha), ac));
+
+    [coef_J_pure, mon_J_pure] = coeffs(Jacob(i), x);
+    mons{i} = mon_J_pure;
+    length(mon_J_pure)
+end
+
+A_coef = sym('A_coef', [2, 42]);
+showSyms(symvar(A_coef));
+
+B_coef = sym('B_coef', [2, 11]);
+showSyms(symvar(B_coef));
+
+f1 = A_coef(1,:)*mons{1}'
+f2 = A_coef(2,:)*mons{2}'
+f3 = B_coef(1,:)*mons{3}'
+f4 = B_coef(2,:)*mons{4}'
+f5 = ac * ac + as * as - 1
+f6 = gc * gc + gs * gs - 1
+
+res = so
+
+%res=solve(Jacob, alpha_2, gama_2, t1 ,t2, 'ReturnConditions', true)
+
+return
+
+function q = quaternion_multiply(q1, q2)
+    w1 = q1(1); x1 = q1(2); y1 = q1(3); z1 = q1(4);
+    w2 = q2(1); x2 = q2(2); y2 = q2(3); z2 = q2(4);
+    
+    w = w1*w2 - x1*x2 - y1*y2 - z1*z2;
+    x = w1*x2 + x1*w2 + y1*z2 - z1*y2;
+    y = w1*y2 - x1*z2 + y1*w2 + z1*x2;
+    z = w1*z2 + x1*y2 - y1*x2 + z1*w2;
+    
+    q = [w, x, y, z];
+end
