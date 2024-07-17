@@ -102,7 +102,7 @@ need_plot_no_noise = false;
 
 %% 参数设置
 % 时间参数
-t = linspace(0, 1.5*pi, 200); % 时间变量,1.5pi确保方向没反
+t = linspace(0, 1.5*pi, 20); % 时间变量,1.5pi确保方向没反
 
 % 生成8字轨迹参数
 x = sin(t);

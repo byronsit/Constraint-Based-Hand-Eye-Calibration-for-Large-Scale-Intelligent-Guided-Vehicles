@@ -1,0 +1,93 @@
+Introduction
+------------
+
+This software package contains Groebner basis solvers generator as 
+described in paper
+
+Kukelova Z., Bujnak M., Pajdla T., Automatic Generator of Minimal 
+Problem Solvers, ECCV 2008, Marseille, France, October 12-18, 2008
+
+Please refer to the license.txt for licensing details.
+
+
+Installation
+-----------------------
+
+This package does not require any installation. Package contains all 
+necessary modules. By default the solvers generator uses Macaulay2 to 
+compute Groefner basis (GB). Or it is possible to use Maple toolbox to 
+compute GB.
+
+Please refer to "generator\gbs_InitConfig.m" for further generator 
+configuration. The file should be self explanatory enough.
+
+
+Groebner basis solver
+---------------------
+
+We recommend to install Macaulay2 software package which provides fast and 
+stable Groebner basis solver. 
+Download it from "http://www.math.uiuc.edu/Macaulay2/" or install one 
+(for Windows) located in prerequisites directory ("macaulay2-0.9.2-3.msi"). 
+
+If you are using this package for Windows, update all "!!TODO:" labeled 
+items in "gbsMacaulay\calc.bat". Please remove "!!TODO:" label and fill 
+correct full paths to Macaulay2 installation directory according to 
+example in "calc.bat".
+
+Then, check that "% cfg.GBSolver = @gbs_findAlgB_macaulay;" line in 
+"generator\gbs_InitConfig.m" is uncommented. This will enable Macaulay 
+Groebner basis solver in the solvers generator.
+
+
+Custom Groebner basis solver
+----------------------------
+
+Note that "cfg.GBSolver" is any function of the form:
+
+    [algB res] = GBSolver(cfg, eq, known, unknown);
+
+which returns basis of algebra B (please refer to the paper) given list of 
+equations, known and unknown variables. By default, the package contains 
+"gbs_findAlgB_macaulay" and "gbs_findAlgB_maple" which are wrappers to 
+Macaulay2 and Maple Groebner basis solvers. However, you can implement your 
+own wrapper.
+
+
+Using matrix patitioning
+------------------------
+
+To enable matrix patitioning change variable "cfg.cfg.matrixPartitioning" 
+in config file "generator\gbs_InitConfig.m" according to the description in 
+this file.
+
+This package uses tool PaToH to partition sparse matrices to speed up the 
+Gauss-Jordan eliminations. This tool is not available for Windows. To 
+download this tool see "http://bmi.osu.edu/~umit/software.html#patoh" or 
+use downloaded packages located in "prerequisites/PaToH/". For installation 
+see instructions enclosed in these packages.
+
+
+Limitations
+-----------
+
+This package has been tested on Matlab 2015 64bit and 32bit. Code 
+generator does not handle all cases when basis of algebra A does not 
+contain action matrix variable. Then, eigenvalues of the action matrix are 
+solutions to the action variable and corresponding eigenvectors contain 
+solution to remaining unknowns.
+
+
+First test
+----------
+
+To add all required paths run script "setpaths.m".
+
+Set of some examples of minimal problems are stored in folder 
+"minimalProblems". To generate solver for some exmaple execute function 
+"gbs_GenerateSolver(nameOfMinimalProblem)", for example 
+"gbs_GenerateSolver('sw6pt')". All examples of minimal problems are self 
+explanatory and will teach you how to use the generator.
+
+The solver generator must be called from its root directory (the place, 
+where "setpath.m" file is located).

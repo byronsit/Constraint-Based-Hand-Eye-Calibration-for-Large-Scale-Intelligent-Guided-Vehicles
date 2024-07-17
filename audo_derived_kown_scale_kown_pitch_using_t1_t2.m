@@ -1,7 +1,7 @@
 
 % 转化为最后还是A T_bc' = T_bc' * B,其中B是相机的轨迹。这样比较简单
 % 这个new似乎是ok的!让我来求解试试看
-% 这次，我们把t1和t2"表示掉",减少输入的数据量,期望简化问题
+% 最后求grobner也用了t1和t2的数值。(it looks that we still need to kil the t1 and t2)
 
 clear all
 close all
@@ -148,69 +148,23 @@ J = J_coef*mon_J_pure.';
 Jacob = jacobian(J, x).'; %对原始的关于三角函数的进行求导
 
 
-%% 用ac as gc gs来表达t1和t2?
+for i = 1 : length(x)
+    % Jacob(i) = simplify(subs(Jacob(i), sin(gama), gs));
+    % Jacob(i) = simplify(subs(Jacob(i), cos(gama), gc));
+    % Jacob(i) = simplify(subs(Jacob(i), sin(alpha), as));
+    % Jacob(i) = simplify(subs(Jacob(i), cos(alpha), ac));
 
-res=solve(Jacob(5),Jacob(6), t1, t2, 'ReturnConditions', true);
-t1 = res.t1;
-t2 = res.t2;
-
-% 重新恢复到Jacob的带入
-clear mons
-for i = 1 : 4
-    [coef_J_pure, mon_J_pure] = coeffs(eval(Jacob(i)), x(1:4));
-    generateFuncFile(coef_J_pure, fullfile('func_files', ['coef_J_pure_new_',num2str(i),'_',problem_name,'.m']), J_coef);
+    [coef_J_pure, mon_J_pure] = coeffs(Jacob(i), x);
+    generateFuncFile(coef_J_pure, fullfile('func_files', ['coef_J_pure_',num2str(i),'_',problem_name,'.m']), J_coef);
     mons{i} = mon_J_pure;
     length(mon_J_pure)
 end
 
-% 还需要表达t1和t2
-generateFuncFile(t1, fullfile('func_files', ['t1_new_',problem_name,'.m']), {J_coef, x(1:4)});
-generateFuncFile(t2, fullfile('func_files', ['t2_new_',problem_name,'.m']), {J_coef, x(1:4)});
-
-
-
-
-
-[ac*gc^2, ac*gc*gs, ac*gc, ac*gs^2, ac*gs, ac, as*gc^2, as*gc*gs, as*gc, as*gs^2, as*gs, as, gc^2, gc*gs, gc, gs^2, gs, 1]
-[ac^2*gc, ac^2*gs, ac^2, ac*as*gc, ac*as*gs, ac*as, ac*gc, ac*gs, ac, as^2*gc, as^2*gs, as^2, as*gc, as*gs, as, gc, gs, 1]
-
-
-
-
-
-
-
-
-
-
-return
-%res=solve(Jacob(1),Jacob(3), t1, t2);
-
-% t1的表达
-[coef_t1_pure, mon_t1_pure]  = coeffs(simplify( res.t1), x(1:4));
-generateFuncFile(coef_t1_pure, fullfile('func_files', ['t1_coef_',problem_name,'.m']), {J_coef});
- 
-
-t1_coef = sym('t1_coef', [1, length(coef_t1_pure)]);
-showSyms(symvar(t1_coef));
-t1 = t1_coef * mon_t1_pure.'
-
-
-% t2的表达
-[coef_t2_pure, mon_t2_pure]  = coeffs(simplify( res.t2), [t1;t2]);
-generateFuncFile(coef_t2_pure, fullfile('func_files', ['t2_coef_',problem_name,'.m']), {J_coef});
- 
-
-t2_coef = sym('t2_coef', [1, length(coef_t2_pure)]);
-showSyms(symvar(t2_coef));
-t2 = t2_coef * mon_t2_pure.'
-
-% 重新恢复到Jacob的带入
-for i = 1 : length(4)
-    [coef_J_pure, mon_J_pure] = coeffs(eval(Jacob(i)), x(1:4));
-    generateFuncFile(coef_J_pure, fullfile('func_files', ['coef_J_pure_new_',num2str(i),'_',problem_name,'.m']), J_coef);
-    mons{i} = mon_J_pure;
-    length(mon_J_pure)
-end
-
+%2，4行可以不需要！
+[ac*gc^2, ac*gc*gs, ac*gc, ac*gs^2, ac*gs, ac, as*gc^2, as*gc*gs, as*gc, as*gs^2, as*gs, as, gc^2, gc*gs, gc*t1, gc*t2, gc, gs^2, gs*t1, gs*t2, gs, t1, t2, 1]
+%[ac*gc^2, ac*gc*gs, ac*gc, ac*gs^2, ac*gs, ac, as*gc^2, as*gc*gs, as*gc, as*gs^2, as*gs, as, gc^2, gc*gs, gc*t1, gc*t2, gc, gs^2, gs*t1, gs*t2, gs, t1, t2, 1]
+[ac^2*gc, ac^2*gs, ac^2, ac*as*gc, ac*as*gs, ac*as, ac*gc, ac*gs, ac*t1, ac*t2, ac, as^2*gc, as^2*gs, as^2, as*gc, as*gs, as*t1, as*t2, as, gc, gs, t1, t2, 1]
+%[ac^2*gc, ac^2*gs, ac^2, ac*as*gc, ac*as*gs, ac*as, ac*gc, ac*gs, ac*t1, ac*t2, ac, as^2*gc, as^2*gs, as^2, as*gc, as*gs, as*t1, as*t2, as, gc, gs, t1, t2, 1]
+[ac*gc, ac*gs, ac, as*gc, as*gs, as, gc, gs, t1, t2, 1]
+[ac*gc, ac*gs, ac, as*gc, as*gs, as, gc, gs, t1, t2, 1]
 
